@@ -1,0 +1,7 @@
+# Ignore screenshots and generated files
+RailwayReservationTest/src/screenshots/
+RailwayReservationTest/src/test_summary.txt
+*.class
+.DS_Store
+# Ignore Excel results if you want to keep your repo clean (optional)
+RailwayReservationTest/src/sourceanddest.xlsx
