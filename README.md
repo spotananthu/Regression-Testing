@@ -1,17 +1,41 @@
-# Regression Testing - Railway Reservation System
+# RailwayReservationTest
 
-This project demonstrates regression testing automation for an online railway reservation system using Selenium WebDriver and Apache POI (for Excel integration) in Java.
+Automated regression testing for a railway reservation web application using Selenium WebDriver and Java, with Excel-driven test data and advanced reporting features.
 
 ## Features
-- Automated login testing using Selenium
-- Test data management via Excel (Apache POI)
-- Supports regression and boundary value analysis
+- **Automatic Screenshot on Failure:** Only failed test cases generate screenshots, saved with timestamps for traceability in `src/screenshots/`.
+- **Test Summary Report:** At the end of each run, a summary (total, passed, failed, total time) is printed and saved to `src/test_summary.txt`.
+- **Timestamped Screenshots:** Screenshots are saved with a timestamp in the filename.
+- **Input Field Highlighting:** Input fields are visually highlighted before data entry for clarity in demos and screenshots.
+- **Execution Time Logging:** Each test and the total suite execution time are logged.
+- **Excel Result Color Coding:** Test results are written back to the Excel file, with green for pass and red for fail (using Apache POI).
+
+## Project Structure
+- `RailwayReservationTest/src/`
+  - `LoginTest.java` — Main test runner
+  - `ExcelReader.java` — Excel utility for reading/writing test data and results
+  - `screenshots/` — (auto-created) Stores screenshots of failed tests
+  - `test_summary.txt` — Test summary output
+  - `sourceanddest.xlsx` — Test data Excel file (see below for format)
+- `poi-lib/` — Apache POI libraries
+- `selenium-java-4.32.0/` — Selenium Java libraries
+- `chromedriver-mac-arm64/` — ChromeDriver binary (macOS ARM64)
 
 ## Prerequisites
-- Java 8 or above
+- Java 11 or later
 - Google Chrome browser
-- Compatible ChromeDriver (already included)
-- All dependencies (Selenium, Apache POI, etc.) are included in the repo
+- ChromeDriver (already included)
+- All required JARs (see classpath in run instructions)
+
+## Excel Test Data Format
+Your `sourceanddest.xlsx` should have the following columns (example):
+
+| Test Case ID | Test Desc | Pre-conditions | Test Steps | Test Data |  |  | Expected Result | Post-conditions | Actual Result | Status (Pass/Fail) |
+|--------------|-----------|----------------|------------|-----------|----|----|----------------|-----------------|---------------|--------------------|
+|              |           |                |            | from      | to |    |                |                 |               |                    |
+| TS_01        | ...       | ...            | ...        | NDLS      | BCT|    | ...            | ...             | ...           | Pass               |
+
+- The script reads the `from` and `to` values from columns 4 and 5 (zero-based index) starting from the second data row (skipping headers).
 
 ## How to Run
 
@@ -22,35 +46,35 @@ This project demonstrates regression testing automation for an online railway re
 
 2. **Compile:**
    ```zsh
-   javac -cp ".:selenium-java-4.32.0/*:commons-compress-1.23.0.jar:xmlbeans-5.1.1.jar:poi-lib/poi-bin-5.2.3/poi-5.2.3.jar:poi-lib/poi-bin-5.2.3/poi-ooxml-5.2.3.jar:poi-lib/poi-bin-5.2.3/poi-ooxml-full-5.2.3.jar:poi-lib/poi-bin-5.2.3/lib/*" RailwayReservationTest/src/ExcelReader.java RailwayReservationTest/src/LoginTest.java
+   cd RailwayReservationTest/src
+   javac -cp ".:../poi-lib/poi-bin-5.2.3/*:../selenium-java-4.32.0/*:../log4j-core-2.20.0.jar:../commons-compress-1.23.0.jar:../xmlbeans-5.1.1.jar" *.java
    ```
 
 3. **Run:**
    ```zsh
-   java -cp ".:log4j-core-2.20.0.jar:selenium-java-4.32.0/*:commons-compress-1.23.0.jar:xmlbeans-5.1.1.jar:poi-lib/poi-bin-5.2.3/poi-5.2.3.jar:poi-lib/poi-bin-5.2.3/poi-ooxml-5.2.3.jar:poi-lib/poi-bin-5.2.3/poi-ooxml-full-5.2.3.jar:poi-lib/poi-bin-5.2.3/lib/*:RailwayReservationTest/src" LoginTest
+   java -cp ".:../poi-lib/poi-bin-5.2.3/*:../selenium-java-4.32.0/*:../log4j-core-2.20.0.jar:../commons-compress-1.23.0.jar:../xmlbeans-5.1.1.jar" LoginTest
    ```
 
-4. **Make chromedriver executable and allow it if blocked:**
+4. **If you get a security popup for chromedriver:**
    ```zsh
-   xattr -d com.apple.quarantine RailwayReservationTest/chromedriver-mac-arm64/chromedriver
-   chmod +x RailwayReservationTest/chromedriver-mac-arm64/chromedriver
+   xattr -d com.apple.quarantine ../chromedriver-mac-arm64/chromedriver
+   chmod +x ../chromedriver-mac-arm64/chromedriver
    ```
-   If you get a security popup, allow it in System Settings > Privacy & Security.
 
-5. **Prepare your test data:**
-   - Place `credentials.xlsx` in `RailwayReservationTest/src/`.
-   - Format:
-     | username | password |
-     |----------|----------|
-     | user1    | pass1    |
-     | user2    | pass2    |
+5. **Check Results:**
+   - Screenshots: `src/screenshots/`
+   - Test summary: `src/test_summary.txt`
+   - Excel results: `src/sourceanddest.xlsx`
 
-## Project Structure
-- `RailwayReservationTest/src/` - Java source files
-- `ExcelReader/src/` - Excel reading utility
-- `poi-lib/` - Apache POI libraries
-- `selenium-java-4.32.0/` - Selenium libraries
-- `chromedriver-mac-arm64/` - ChromeDriver binary
+## Notes
+- Update the path to ChromeDriver in `LoginTest.java` if your environment differs.
+- Only non-header, non-empty rows are processed from Excel.
+- All dependencies are included in the repo.
 
-## License
-MIT
+## .gitignore
+The following are already gitignored:
+- `RailwayReservationTest/src/screenshots/`
+- `RailwayReservationTest/src/test_summary.txt`
+- `RailwayReservationTest/src/sourceanddest.xlsx` (optional, for privacy)
+- `*.class`, `.DS_Store`
+
