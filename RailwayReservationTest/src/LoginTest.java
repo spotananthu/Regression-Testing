@@ -1,6 +1,5 @@
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,51 +10,50 @@ import java.util.List;
 
 public class LoginTest {
     public static void main(String[] args) throws Exception {
-        System.setProperty("webdriver.chrome.driver", "/Users/I529006/Desktop/SQAT/RailwayReservationTest/chromedriver-mac-arm64/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "RailwayReservationTest/chromedriver-mac-arm64/chromedriver");
 
-        List<String[]> credentials = ExcelReader.getCredentials("/Users/I529006/Desktop/SQAT/RailwayReservationTest/src/credentials.xlsx");
+        List<String[]> credentials = ExcelReader.getCredentials("RailwayReservationTest/src/sourceanddest.xlsx");
 
         for (String[] creds : credentials) {
             WebDriver driver = new ChromeDriver();
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-            driver.get("https://www.irctc.co.in/nget/train-search");
+            driver.get("https://www.easemytrip.com/railways/");
 
             // Maximize window
             driver.manage().window().maximize();
 
-            // Click on LOGIN button
-            WebElement loginLink = driver.findElement(By.xpath("//a[contains(text(),'LOGIN')]"));
-            loginLink.click();
+            // Enter from and to destination
+            WebElement fromInput=driver.findElement(By.xpath("//input[@placeholder='Choose Source station']"));
+            fromInput.clear();
+            fromInput.sendKeys(creds[0]);
+            Thread.sleep(1000); // wait for suggestions
+            fromInput.sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
+            WebElement toInput=driver.findElement(By.xpath("//input[@placeholder='Choose destination station']"));
+            toInput.clear();
+            toInput.sendKeys(creds[1]);
+            Thread.sleep(1000); // wait for suggestions
+            toInput.sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
+            driver.findElement(By.xpath("//input[@placeholder='Depart Date']")).click();
+            driver.findElement(By.xpath("/html/body/div[1]/div[1]/table/tbody/tr[5]/td[6]/a")).click();
 
-            // Wait for login modal to appear (simple wait)
-            Thread.sleep(2000);
+            System.out.println("Entered destination from : " + creds[0]);
+            System.out.println("Entered destination to : " + creds[1]);
+            // Click on the search button
 
-            // Enter username and password
-            driver.findElement(By.cssSelector("input[formcontrolname='userid']")).sendKeys(creds[0]);
-            driver.findElement(By.cssSelector("input[formcontrolname='password']")).sendKeys(creds[1]);
-
-            System.out.println("Entered credentials for user: " + creds[0]);
-
-            // Pause to allow manual CAPTCHA input
-            System.out.println("⏳ Please enter CAPTCHA manually and press Login within 20 seconds...");
+            WebElement searchButton = driver.findElement(By.xpath("//input[@id='SearchAll']"));
+            searchButton.click();
             Thread.sleep(20000);
 
-            // Click on Login button
-            WebElement signInButton = driver.findElement(By.xpath("//button[contains(text(),'SIGN IN')]"));
-            signInButton.click();
-
-            // Wait for response
-            Thread.sleep(20000);
-
-          if (driver.findElement(By.xpath("/html/body/app-root/app-home/div[1]/app-header/div[2]/div[2]/div[2]/nav/ul/li[12]/a")).isDisplayed()) {
-                System.out.println("✅ Login has succeeded for user " + creds[0]);
-            } else {
-                System.out.println("❌ Login has failed for user " + creds[0]);
+            try {
+                WebElement element= driver.findElement(By.xpath("/html/body/form/div[2]/div[2]/div/div[8]/a"));
+                if (element.isDisplayed()) {
+                    System.out.println("✅ Search train has succeeded for from " + creds[0] + " to " + creds[1]);
+                }
+            } catch (Exception e) {
+                System.out.println("❌ Search train has failed for from " + creds[0] + " to " + creds[1]);
             }
-
             driver.quit();
         }
     }
 }
-
